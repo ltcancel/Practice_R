@@ -32,10 +32,24 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 Libraries 
 ```{r}
 #install.packages("tidyverse")
+#install.packages("maps")
+library(maps)
 library(tidyverse)
 ```
 
 Chapter 3
+
+graph grammar
+
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(
+     mapping = aes(<MAPPINGS>),
+     stat = <STAT>, 
+     position = <POSITION>
+  ) +
+  <COORDINATE_FUNCTION> +
+  <FACET_FUNCTION>
+  
 ```{r}
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, shape = class))
@@ -59,5 +73,85 @@ ggplot(data = mpg) +
     mapping = aes(x = displ, y = hwy, color = drv),
     show.legend = FALSE
   )
+
+#display multiple geoms in the same plot 
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  geom_smooth(mapping = aes(x = displ, y = hwy))
+
+# OR
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(se = FALSE) #se = FALSE - optional
+
+#multiple geoms with color
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = class)) +
+  geom_smooth()
+
+#multiple geoms with different specific data 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = class)) +
+  geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
+```
+
+Bar Charts
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = stat(prop), group  = 1))
+
+#stat summary used to summarize the y values for each unique x value
+ggplot(data = diamonds) +
+  stat_summary(
+    mapping = aes(x = cut, y = depth), 
+    fun.ymin = min,
+    fun.ymax = max,
+    fun.y = median
+  )
+
+?stat_bin
+```
+
+More bar charts
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, color = cut))
+
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+
+bar <- ggplot(data = diamonds) +
+  geom_bar(
+    mapping = aes(x = cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1
+  ) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+bar + coord_flip()
+bar + coord_polar()
+```
+
+Box plots
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Polygon
+```{r}
+nz = map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", color = "black")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(full = "white", color = "black") +
+  coord_quickmap()
 ```
 
