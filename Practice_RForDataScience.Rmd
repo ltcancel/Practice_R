@@ -35,6 +35,7 @@ Libraries
 #install.packages("maps")
 library(maps)
 library(tidyverse)
+library(nycflights13)
 ```
 
 Chapter 3
@@ -153,5 +154,88 @@ ggplot(nz, aes(long, lat, group = group)) +
 ggplot(nz, aes(long, lat, group = group)) +
   geom_polygon(full = "white", color = "black") +
   coord_quickmap()
+```
+Chapter 5 - Basic data manipulation 
+```{r}
+flights
+filter(flights, month == 1, day == 1)
+
+jan1 <- filter(flights, month == 1, day == 1)
+jan1
+
+#print results and save to a variable in 1 line of code
+(dec25 <- filter(flights, month == 12, day == 25))
+
+filter(flights, month == 11 | month || 12)
+
+nov_dec <- filter(flights, month %in% c(11,12))
+nov_dec
+```
+
+arrange
+```{r}
+arrange(flights, year, month, day)
+
+arrange(flights, desc(dep_delay))
+```
+
+select
+```{r}
+select(flights, year, month, day)
+
+#only columns between year and data
+select(flights, year:day)
+
+#exclude columns between year and date
+select(flights, -(year:day))
+
+#bring columns to the start of the df
+select (flights, time_hour, air_time, everything())
+
+```
+
+rename
+```{r}
+rename(flights, tail_num = tailnum)
+```
+
+mutate
+```{r}
+#smaller df to practice with
+flights_sml <- select(flights,
+                      year:day,
+                      ends_with("delay"),
+                      distance, air_time
+                      )
+#create new variables
+mutate(flights_sml,
+       gain = dep_delay - arr_delay,
+       speed = distance / air_time * 60
+       )
+#keep only the new variables
+transmute(flights,
+         gain = dep_delay - arr_delay,
+         hours = air_time / 60,
+         gain_per_hour = gain / hours
+         )
+
+transmute(flights,
+          dep_time,
+          hour = dep_time %/% 100,
+          minute = dep_time %% 100
+          )
+
+```
+
+Logs
+```{r}
+(x <- 1:10)
+
+lag(x)
+lead(x)
+
+#cumulative sum and mean
+cumsum(x)
+cummean(x)
 ```
 
